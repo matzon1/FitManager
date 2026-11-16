@@ -1,45 +1,41 @@
-# FitManager — Gym Management App
+# FitManager
 
-A full-stack gym management system built with .NET 8 Web API + React + TypeScript.
+Gym management app: members, membership plans, payments, and attendance.
+Built with a .NET 8 Web API and a React + TypeScript client.
 
-## Tech Stack
-- **Backend:** .NET 8, Entity Framework Core, SQLite, JWT Auth, FluentValidation, Swagger
-- **Frontend:** React 18, TypeScript, Tailwind CSS, React Query, Zustand, Axios
-
----
+## Tech stack
+- **Backend:** .NET 8, ASP.NET Core Web API, Entity Framework Core, SQLite, JWT authentication, BCrypt, Swagger
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, React Query, Zustand, Axios
 
 ## Getting started
 
-### 1. Run the backend
+### Prerequisites
+- .NET 8 SDK
+- Node.js (LTS)
 
-Open a terminal in `FitManager/FitManager.API` and run:
-
+### Backend
 ```bash
-dotnet restore
-dotnet tool install --global dotnet-ef
-dotnet ef migrations add InitialCreate
+cd FitManager.API
+dotnet user-secrets set "Jwt:Key" "<any random text, at least 32 characters>"
 dotnet run
 ```
+The app applies the migrations and adds demo data on the first run.
+Swagger: http://localhost:57264/swagger
 
-API: http://localhost:5000  
-Swagger: http://localhost:5000/swagger
-
-### 2. Run the frontend
-
-Open a second terminal in `FitManager/fitmanager-client`:
-
+### Frontend
 ```bash
+cd fitmanager-client
 npm install
 npm run dev
 ```
+The app opens at http://localhost:5173.
 
-App: http://localhost:5173
+## Demo credentials (seed data only)
+| Username | Password | Role |
+|----------|----------|------|
+| admin | admin123 | Admin: full access |
+| staff | staff123 | Staff: read and check-in |
 
----
-
-## Demo credentials
-
-| Username | Password | Role  |
-|----------|----------|-------|
-| admin    | admin123 | Admin |
-| staff    | staff123 | Staff |
+## Project status
+- Done: JWT login with roles, members, plans, payments, attendance, and dashboard endpoints (API)
+- In progress: client pages for memberships, payments, and attendance
