@@ -5,6 +5,7 @@ using FitManager.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace FitManager.API.Controllers;
 
@@ -100,12 +101,23 @@ public class PaymentsController(AppDbContext db) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create(CreatePaymentRequest req)
+    public async Task<ActionResult<PaymentDto>> Create(CreatePaymentRequest req)
     {
         var payment = new Payment { MemberId = req.MemberId, Amount = req.Amount, Status = req.Status, Notes = req.Notes, MemberMembershipId = req.MemberMembershipId };
+        var member = await db.Members.FindAsync(req.MemberId);
+        if (member is null) return NotFound("Member not found.");
         db.Payments.Add(payment);
         await db.SaveChangesAsync();
-        return Ok(payment);
+        return CreatedAtAction(nameof(GetAll), new PaymentDto(payment.Id, payment.MemberId, member.FirstName + " " + member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes));
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<PaymentDto>> GetById(int id)
+    {
+        var payment = await db.Payments.Include(p => p.Member).FirstOrDefaultAsync(p => p.Id == id);
+        if (payment is null) return NotFound();
+        return CreatedAtAction(nameof(GetById), new { id = payment.Id },
+            new PaymentDto(payment.Id, payment.MemberId, payment.Member.FirstName + " " + payment.Member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes));
     }
 }
 
