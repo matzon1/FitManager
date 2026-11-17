@@ -31,7 +31,7 @@ export const membershipsApi = {
 
 export const paymentsApi = {
   getAll: () => api.get<Payment[]>('/payments').then(r => r.data),
-  create: (data: { memberId: number; amount: number; status: string; notes: string }) =>
+  create: (data: { memberId: number; amount: number; status: number; notes: string }) =>
     api.post<Payment>('/payments', data).then(r => r.data),
 };
 
