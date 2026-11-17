@@ -108,7 +108,8 @@ public class PaymentsController(AppDbContext db) : ControllerBase
         if (member is null) return NotFound("Member not found.");
         db.Payments.Add(payment);
         await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAll), new PaymentDto(payment.Id, payment.MemberId, member.FirstName + " " + member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes));
+        return CreatedAtAction(nameof(GetById), new { id = payment.Id },
+    new PaymentDto(payment.Id, payment.MemberId, member.FirstName + " " + member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes));
     }
 
     [HttpGet("{id}")]
@@ -116,8 +117,7 @@ public class PaymentsController(AppDbContext db) : ControllerBase
     {
         var payment = await db.Payments.Include(p => p.Member).FirstOrDefaultAsync(p => p.Id == id);
         if (payment is null) return NotFound();
-        return CreatedAtAction(nameof(GetById), new { id = payment.Id },
-            new PaymentDto(payment.Id, payment.MemberId, payment.Member.FirstName + " " + payment.Member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes));
+        return new PaymentDto(payment.Id, payment.MemberId, payment.Member.FirstName + " " + payment.Member.LastName, payment.Amount, payment.PaymentDate, payment.Status.ToString(), payment.Notes);
     }
 }
 
