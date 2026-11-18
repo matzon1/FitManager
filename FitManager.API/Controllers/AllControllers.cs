@@ -142,12 +142,14 @@ public class AttendanceController(AppDbContext db) : ControllerBase
     }
 
     [HttpPost("checkin/{memberId}")]
-    public async Task<IActionResult> CheckIn(int memberId)
+    public async Task<ActionResult<AttendanceLogDto>> CheckIn(int memberId)
     {
+        var member = await db.Members.FindAsync(memberId);
+        if (member is null) return NotFound("Member not found.");
         var log = new AttendanceLog { MemberId = memberId };
         db.AttendanceLogs.Add(log);
         await db.SaveChangesAsync();
-        return Ok(log);
+        return Ok(new AttendanceLogDto(log.Id, log.MemberId, member.FirstName + " " + member.LastName, log.CheckInTime, log.CheckOutTime));
     }
 
     [HttpPut("checkout/{logId}")]
@@ -155,9 +157,10 @@ public class AttendanceController(AppDbContext db) : ControllerBase
     {
         var log = await db.AttendanceLogs.FindAsync(logId);
         if (log is null) return NotFound();
+        if (log.CheckOutTime is not null) return BadRequest("Already checked out.");
         log.CheckOutTime = DateTime.UtcNow;
         await db.SaveChangesAsync();
-        return Ok(log);
+        return NoContent();
     }
 }
 
