@@ -4,6 +4,7 @@ import { useAuthStore } from './store/authStore';
 import Layout from './components/layout/Layout';
 import { LoginPage, DashboardPage, MembersPage } from './pages/Pages';
 import { PaymentsPage } from './pages/PaymentsPage';
+import { MembershipsPage } from './pages/MembershipsPage';
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/members" element={<MembersPage />} />
-                  <Route path="/memberships" element={<div className="text-gray-500">Memberships — coming in phase 2</div>} />
+                  <Route path="/memberships" element={<MembershipsPage />} />
                   <Route path="/payments" element={<PaymentsPage />} />
                   <Route path="/attendance" element={<div className="text-gray-500">Attendance — coming in phase 2</div>} />
                 </Routes>

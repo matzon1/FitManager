@@ -62,6 +62,7 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
 {
     [HttpGet]
     public async Task<IEnumerable<MemberMembershipDto>> GetAll() =>
+
         await db.MemberMemberships
             .Include(mm => mm.Member)
             .Include(mm => mm.MembershipPlan)
@@ -70,11 +71,14 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Assign(AssignMembershipRequest req)
+    public async Task<ActionResult<MemberMembershipDto>> Assign(AssignMembershipRequest req)
     {
         var plan = await db.MembershipPlans.FindAsync(req.MembershipPlanId);
         if (plan is null) return NotFound("Plan not found.");
+        var member = await db.Members.FindAsync(req.MemberId);
+        if (member is null) return NotFound("Member not found.");
         var mm = new MemberMembership
+      
         {
             MemberId = req.MemberId,
             MembershipPlanId = req.MembershipPlanId,
@@ -83,7 +87,7 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
         };
         db.MemberMemberships.Add(mm);
         await db.SaveChangesAsync();
-        return Ok(mm);
+        return Ok(new MemberMembershipDto(mm.Id, mm.MemberId, member.FirstName + " " + member.LastName, plan.Name, mm.StartDate, mm.EndDate, mm.Status.ToString()));
     }
 }
 

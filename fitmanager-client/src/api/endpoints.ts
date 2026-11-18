@@ -1,5 +1,5 @@
 import api from './client';
-import type { Member, MembershipPlan, Payment, AttendanceLog, DashboardStats, LoginResponse } from '../types';
+import type { Member, MembershipPlan, Payment, AttendanceLog, DashboardStats, LoginResponse, MemberMembership } from '../types';
 
 export const authApi = {
   login: (username: string, password: string) =>
@@ -24,7 +24,7 @@ export const plansApi = {
 };
 
 export const membershipsApi = {
-  getAll: () => api.get('/membermemberships').then(r => r.data),
+  getAll: () => api.get<MemberMembership[]>('/membermemberships').then(r => r.data),
   assign: (memberId: number, planId: number, startDate: string) =>
     api.post('/membermemberships', { memberId, membershipPlanId: planId, startDate }),
 };
