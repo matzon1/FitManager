@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { attendanceApi, membersApi } from '../api/endpoints';
 import { useState } from 'react';
-
+import {parseUtc}  from '../utils/dates';
 
 
 
@@ -67,8 +67,8 @@ export function AttendancePage() {
                     {attendanceLogs?.map(log => (
                         <tr key={log.id} className="border-b border-gray-200">
                             <td className="py-2 px-4">{log.memberName}</td>
-                            <td className="py-2 px-4">{log.checkInTime ? new Date(log.checkInTime).toLocaleTimeString() : 'Not checked in'}</td>
-                            <td className="py-2 px-4">{log.checkOutTime ? new Date(log.checkOutTime).toLocaleTimeString() : <button onClick={() => handleCheckOut(log.id)} className="text-blue-500 hover:underline">Check Out</button>}</td>
+                            <td className="py-2 px-4">{log.checkInTime ? parseUtc(log.checkInTime).toLocaleTimeString() : 'Not checked in'}</td>
+                            <td className="py-2 px-4">{log.checkOutTime ? parseUtc(log.checkOutTime).toLocaleTimeString() : <button onClick={() => handleCheckOut(log.id)} className="text-blue-500 hover:underline">Check Out</button>}</td>
                         </tr>
                     ))}
                 </tbody>

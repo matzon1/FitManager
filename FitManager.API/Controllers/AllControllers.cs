@@ -174,9 +174,11 @@ public class DashboardController(AppDbContext db) : ControllerBase
     {
         var now = DateTime.UtcNow;
         var activeMembers = await db.Members.CountAsync(m => m.Status == MemberStatus.Active);
-        var revenueThisMonth = await db.Payments
-            .Where(p => p.PaymentDate.Month == now.Month && p.PaymentDate.Year == now.Year && p.Status == PaymentStatus.Paid)
-            .SumAsync(p => p.Amount);
+        var paidAmounts = await db.Payments
+            .Where(p => p.Status == PaymentStatus.Paid && p.PaymentDate.Month == now.Month && p.PaymentDate.Year == now.Year)
+            .Select(p => p.Amount)
+            .ToListAsync();
+        var revenueThisMonth = paidAmounts.Sum();
         var checkInsToday = await db.AttendanceLogs.CountAsync(a => a.CheckInTime.Date == now.Date);
         var expiringSoon = await db.MemberMemberships
             .CountAsync(mm => mm.Status == MembershipStatus.Active && mm.EndDate <= now.AddDays(30));

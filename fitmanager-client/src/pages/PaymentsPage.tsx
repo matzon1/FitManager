@@ -5,6 +5,7 @@ import type { Payment } from '../types';
 import { Plus } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { membersApi } from '../api/endpoints';
+import { parseUtc } from '../utils/dates';
 
 
 export function PaymentsPage() {
@@ -42,7 +43,7 @@ return (
                     <td className="px-4 py-3 text-gray-600">{p.amount.toFixed(2)}</td>
                     <td className="px-4 py-3 text-gray-600">{p.status}</td>
                     <td className="px-4 py-3 text-gray-600">{p.notes}</td>
-                    <td className="px-4 py-3 text-gray-600">{new Date(p.paymentDate).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-gray-600">{parseUtc(p.paymentDate).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
