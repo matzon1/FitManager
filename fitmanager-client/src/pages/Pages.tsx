@@ -91,7 +91,7 @@ export function DashboardPage() {
           {data?.recentCheckIns.map(log => (
             <div key={log.id} className="flex justify-between text-sm py-2 border-b border-gray-100 last:border-0">
               <span className="font-medium text-gray-800">{log.memberName}</span>
-              <span className="text-gray-500">{new Date(log.checkInTime).toLocaleTimeString()}</span>
+              <span className="text-gray-500">{parseUtc(log.checkInTime).toLocaleTimeString()}</span>
             </div>
           ))}
         </div>
@@ -104,6 +104,7 @@ import { membersApi } from '../api/endpoints';
 import { Plus } from 'lucide-react';
 import type { Member } from '../types';
 import { useAuthStore as useAuth } from '../store/authStore';
+import { parseUtc } from '../utils/dates';
 
 export function MembersPage() {
   const { data: members, isLoading, refetch } = useQuery({ queryKey: ['members'], queryFn: membersApi.getAll });
