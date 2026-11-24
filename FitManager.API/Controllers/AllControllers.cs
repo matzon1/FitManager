@@ -2,6 +2,7 @@ using FitManager.API.Data;
 using FitManager.API.DTOs;
 using FitManager.API.Models;
 using FitManager.API.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -94,8 +95,9 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PaymentsController(AppDbContext db) : ControllerBase
+public class PaymentsController(AppDbContext db, IValidator<CreatePaymentRequest> validator) : ControllerBase
 {
+    
     [HttpGet]
     public async Task<IEnumerable<PaymentDto>> GetAll() =>
         await db.Payments
@@ -107,6 +109,8 @@ public class PaymentsController(AppDbContext db) : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<PaymentDto>> Create(CreatePaymentRequest req)
     {
+        var validationResult = await validator.ValidateAsync(req);
+        if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.ToDictionary()));
         var payment = new Payment { MemberId = req.MemberId, Amount = req.Amount, Status = req.Status, Notes = req.Notes, MemberMembershipId = req.MemberMembershipId };
         var member = await db.Members.FindAsync(req.MemberId);
         if (member is null) return NotFound("Member not found.");
