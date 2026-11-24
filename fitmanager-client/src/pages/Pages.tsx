@@ -62,10 +62,12 @@ import { dashboardApi } from '../api/endpoints';
 import { Users, DollarSign, CalendarCheck, AlertCircle } from 'lucide-react';
 
 export function DashboardPage() {
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard'], queryFn: dashboardApi.getStats });
+  const { data, isLoading, isError } = useQuery({ queryKey: ['dashboard'], queryFn: dashboardApi.getStats });
 
   if (isLoading) return <div className="text-gray-500">Loading...</div>;
 
+  if (isError) return <div className="text-red-600">Could not load the dashboard. Please try again later.</div>;
+  
   const stats = [
     { label: 'Active members', value: data?.totalActiveMembers ?? 0, icon: Users, color: 'text-blue-600' },
     { label: 'Revenue this month', value: `$${(data?.revenueThisMonth ?? 0).toFixed(2)}`, icon: DollarSign, color: 'text-green-600' },
