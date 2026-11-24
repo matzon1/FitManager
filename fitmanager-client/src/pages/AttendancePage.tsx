@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { attendanceApi, membersApi } from '../api/endpoints';
 import { useState } from 'react';
 import {parseUtc}  from '../utils/dates';
+import axios, { isAxiosError } from 'axios';
 
 
 
@@ -34,8 +35,12 @@ export function AttendancePage() {
             await attendanceApi.checkIn(memberId);
             setMemberId(0); // Reset the selected member after check-in
             refetch();
-        } catch {
-            setError('Failed to check in. Please try again.');
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.status === 409) {
+                setError('Member is already checked in.');
+            } else {
+                setError('Failed to check in. Please try again.');
+            }
         }
     };
 
