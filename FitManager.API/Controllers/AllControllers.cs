@@ -146,6 +146,8 @@ public class AttendanceController(AppDbContext db) : ControllerBase
     {
         var member = await db.Members.FindAsync(memberId);
         if (member is null) return NotFound("Member not found.");
+        if (await db.AttendanceLogs.AnyAsync(a => a.MemberId == memberId && a.CheckOutTime == null))
+            return Conflict("Member is already checked in");
         var log = new AttendanceLog { MemberId = memberId };
         db.AttendanceLogs.Add(log);
         await db.SaveChangesAsync();
