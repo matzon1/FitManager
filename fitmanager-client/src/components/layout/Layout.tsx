@@ -1,7 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, X, CreditCard, Receipt, CalendarCheck, LogOut, Dumbbell, Menu } from 'lucide-react';
+import { LayoutDashboard, Users, X, Sun, Moon, CreditCard, Receipt, CalendarCheck, LogOut, Dumbbell, Menu } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useState } from 'react';
+import {useThemeStore} from "../../store/themeStore";
 
 
 
@@ -18,6 +19,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
   const navigate = useNavigate();
   const { username, role, logout } = useAuthStore();  
   const handleLogout = () => { logout(); navigate('/login'); };
+  const { theme, toggleTheme } = useThemeStore();
 
   return (
     <>
@@ -38,6 +40,12 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
         <div className="px-4 py-4 border-t border-border">
           <div className="text-xs text-muted mb-1">{username}</div>
           <div className="text-xs text-primary-text font-medium mb-3">{role}</div>
+              <button onClick={toggleTheme}
+  aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+  className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors mb-3">
+  {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+  {theme === 'light' ? 'Dark theme' : 'Light theme'}
+</button>
           <button onClick={handleLogout}
             className="flex items-center gap-2 text-sm text-muted hover:text-danger transition-colors">
             <LogOut size={16} /> Sign out
