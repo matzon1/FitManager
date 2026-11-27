@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { membersApi } from '../api/endpoints';
 import { parseUtc } from '../utils/dates';
+import Button from '../components/ui/Button';
 
 
 export function PaymentsPage() {
@@ -28,7 +29,7 @@ if (isLoading) return <div className="text-gray-500">Loading...</div>;
 
 return (
     <div>
-
+       <h1 className="text-xl font-semibold text-gray-900">Payments</h1>
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -50,13 +51,12 @@ return (
               </table>
             </div>
 
-        <h1 className="text-xl font-semibold text-gray-900">Payments</h1>
+       
       <div className="flex items-center justify-between mb-6">
         {role === 'Admin' && (
-          <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <Button onClick={() => setShowForm(true)}>
             <Plus size={16} /> Add payment
-          </button>
+          </Button>
         )}
        {showForm && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
@@ -98,9 +98,8 @@ return (
             onChange={e => setForm({ ...form, notes: (e.target.value) })}/>
 
             <div className="col-span-2 flex gap-2 justify-end">
-              <button type="button" onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button type="submit" className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+              <Button  variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button type="submit" >Save</Button>
             </div>
           </form>
        </div>

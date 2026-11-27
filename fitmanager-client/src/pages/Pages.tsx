@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Dumbbell } from 'lucide-react';
 import { authApi } from '../api/endpoints';
 import { useAuthStore } from '../store/authStore';
+import Button from '../components/ui/Button';
+
 
 export function LoginPage() {
   const [username, setUsername] = useState('');
@@ -46,10 +48,9 @@ export function LoginPage() {
               value={password} onChange={e => setPassword(e.target.value)} placeholder="admin123" required />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
-          <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors">
+          <Button className="w-full" type="submit" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+          </Button>
         </form>
         <p className="text-xs text-gray-400 mt-4">Demo: admin / admin123 or staff / staff123</p>
       </div>
@@ -136,10 +137,9 @@ export function MembersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Members</h1>
         {role === 'Admin' && (
-          <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <Button onClick={() => setShowForm(true)} type="submit">
             <Plus size={16} /> Add member
-          </button>
+          </Button>
         )}
       </div>
 
@@ -156,9 +156,8 @@ export function MembersPage() {
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={form.dateOfBirth} onChange={e => setForm({ ...form, dateOfBirth: e.target.value })} />
             <div className="col-span-2 flex gap-2 justify-end">
-              <button type="button" onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button type="submit" className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+              <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button type="submit" >Save</Button>
             </div>
           </form>
         </div>
