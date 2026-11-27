@@ -4,6 +4,7 @@ import { membersApi, membershipsApi, plansApi } from '../api/endpoints';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Plus } from 'lucide-react';
+import Button from '../components/ui/Button';
 
 
 
@@ -39,6 +40,7 @@ export function MembershipsPage() {
   return (
 
     <div>
+     <h1 className="text-xl font-semibold text-gray-900">Memberships</h1>
   <table className="w-full text-sm">
     <thead className="bg-gray-50 border-b border-gray-200">
       <tr>{['Member', 'Plan', 'Start Date', 'End', 'Status'].map(h => (<th key={h} className="px-4 py-2 text-left">{h}</th>))}</tr>
@@ -60,10 +62,9 @@ export function MembershipsPage() {
 
         <div className="flex items-center justify-between mb-6">
         {role === 'Admin' && (
-          <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <Button onClick={() => setShowForm(true)}>
             <Plus size={16} /> Assign membership
-          </button>
+          </Button>
         )}
        {showForm && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
@@ -84,8 +85,7 @@ export function MembershipsPage() {
 
              <input className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
              value={form.startDate}
-             type="date" step="0.01"
-             placeholder="Amount"
+             type="date" 
             onChange={e => setForm({ ...form, startDate: (e.target.value) })}/>
 
 
@@ -103,9 +103,8 @@ export function MembershipsPage() {
 
 
             <div className="col-span-2 flex gap-2 justify-end">
-              <button type="button" onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button type="submit" className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+              <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button type="submit" >Save</Button>
             </div>
           </form>
        </div>
