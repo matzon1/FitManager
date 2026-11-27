@@ -16,7 +16,7 @@ public record MembershipPlanDto(int Id, string Name, string Description, decimal
 public record CreateMembershipPlanRequest(string Name, string Description, decimal Price, int DurationMonths);
 
 // Member Memberships
-public record MemberMembershipDto(int Id, int MemberId, string MemberName, string PlanName, DateTime StartDate, DateTime EndDate, string Status);
+public record MemberMembershipDto(int Id, int MemberId, string MemberName, string PlanName, DateTime StartDate, DateTime EndDate, string Status, decimal Price);
 public record AssignMembershipRequest(int MemberId, int MembershipPlanId, DateTime StartDate);
 
 // Payments

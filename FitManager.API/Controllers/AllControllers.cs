@@ -67,7 +67,7 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
         await db.MemberMemberships
             .Include(mm => mm.Member)
             .Include(mm => mm.MembershipPlan)
-            .Select(mm => new MemberMembershipDto(mm.Id, mm.MemberId, mm.Member.FirstName + " " + mm.Member.LastName, mm.MembershipPlan.Name, mm.StartDate, mm.EndDate, mm.Status.ToString()))
+            .Select(mm => new MemberMembershipDto(mm.Id, mm.MemberId, mm.Member.FirstName + " " + mm.Member.LastName, mm.MembershipPlan.Name, mm.StartDate, mm.EndDate, mm.Status.ToString(), mm.MembershipPlan.Price))
             .ToListAsync();
 
     [HttpPost]
@@ -88,7 +88,7 @@ public class MemberMembershipsController(AppDbContext db) : ControllerBase
         };
         db.MemberMemberships.Add(mm);
         await db.SaveChangesAsync();
-        return Ok(new MemberMembershipDto(mm.Id, mm.MemberId, member.FirstName + " " + member.LastName, plan.Name, mm.StartDate, mm.EndDate, mm.Status.ToString()));
+        return Ok(new MemberMembershipDto(mm.Id, mm.MemberId, member.FirstName + " " + member.LastName, plan.Name, mm.StartDate, mm.EndDate, mm.Status.ToString(), mm.MembershipPlan.Price));
     }
 }
 

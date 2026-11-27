@@ -31,6 +31,7 @@ export interface MemberMembership {
   startDate: string;
   endDate: string;
   status: MembershipStatus;
+  price: number;
 }
 
 export interface Payment {
