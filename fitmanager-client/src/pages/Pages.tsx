@@ -1,8 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Dumbbell } from 'lucide-react';
-import { authApi } from '../api/endpoints';
-import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
 import Badge, {type Tone } from '../components/ui/Badge';
 import  Card from '../components/ui/Card';
@@ -12,58 +8,6 @@ import { Plus } from 'lucide-react';
 import type { Member } from '../types';
 import { useAuthStore as useAuth } from '../store/authStore';
 import { parseUtc } from '../utils/dates';
-
-
-export function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const login = useAuthStore(s => s.login);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); setError('');
-    try {
-      const data = await authApi.login(username, password);
-      login(data.token, data.username, data.role);
-      navigate('/');
-    } catch {
-      setError('Invalid username or password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl border border-gray-200 p-8 w-full max-w-sm">
-        <div className="flex items-center gap-2 mb-6">
-          <Dumbbell className="text-blue-600" size={24} />
-          <span className="font-semibold text-xl text-gray-900">FitManager</span>
-        </div>
-        <h1 className="text-lg font-medium text-gray-800 mb-6">Sign in</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">Username</label>
-            <Input value={username} onChange={e => setUsername(e.target.value)} placeholder="username" required />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">Password</label>
-            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="password" required />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
-        <p className="text-xs text-gray-400 mt-4">Demo: admin / admin123 or staff / staff123</p>
-      </div>
-    </div>
-  );
-}
-
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../api/endpoints';
 import { Users, DollarSign, CalendarCheck, AlertCircle } from 'lucide-react';
