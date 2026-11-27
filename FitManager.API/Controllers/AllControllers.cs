@@ -140,7 +140,8 @@ public class AttendanceController(AppDbContext db) : ControllerBase
         var today = DateTime.UtcNow.Date;
         return await db.AttendanceLogs
             .Include(a => a.Member)
-            .Where(a => a.CheckInTime.Date == today)
+            .Where(a => a.CheckInTime.Date == today || a.CheckOutTime == null)
+            .OrderByDescending(a => a.CheckInTime)
             .Select(a => new AttendanceLogDto(a.Id, a.MemberId, a.Member.FirstName + " " + a.Member.LastName, a.CheckInTime, a.CheckOutTime))
             .ToListAsync();
     }
@@ -151,7 +152,7 @@ public class AttendanceController(AppDbContext db) : ControllerBase
         var member = await db.Members.FindAsync(memberId);
         if (member is null) return NotFound("Member not found.");
         if (await db.AttendanceLogs.AnyAsync(a => a.MemberId == memberId && a.CheckOutTime == null))
-            return Conflict("Member is already checked in");
+           return Conflict("Member is already checked in");
         var log = new AttendanceLog { MemberId = memberId };
         db.AttendanceLogs.Add(log);
         await db.SaveChangesAsync();
