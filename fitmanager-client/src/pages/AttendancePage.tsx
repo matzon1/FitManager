@@ -57,7 +57,7 @@ export function AttendancePage() {
         <h1 className="text-xl font-semibold text-foreground">Attendance</h1>
       </div>
 
-      <Card className="p-5 mb-6 max-w-2xl">
+      <Card className="p-5 mb-6">
         <h2 className="font-medium mb-4 text-foreground">Check in a member</h2>
         <div className="flex flex-col sm:flex-row gap-2">
           <Select
@@ -71,7 +71,12 @@ export function AttendancePage() {
               </option>
             ))}
           </Select>
-          <Button onClick={handleCheckIn}>Check In</Button>
+          <Button
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors "
+            onClick={handleCheckIn}
+          >
+            Check In
+          </Button>
         </div>
         {error && (
           <p role="alert" className="text-sm text-danger mt-3">
@@ -102,12 +107,12 @@ export function AttendancePage() {
                 </td>
                 <td className="px-4 py-3 text-muted">
                   {log.checkInTime
-                    ? parseUtc(log.checkInTime).toLocaleTimeString()
+                    ? parseUtc(log.checkInTime).toLocaleString()
                     : "Not checked in"}
                 </td>
                 <td className="px-4 py-3 text-muted">
                   {log.checkOutTime ? (
-                    parseUtc(log.checkOutTime).toLocaleTimeString()
+                    parseUtc(log.checkInTime).toLocaleString()
                   ) : (
                     <Button
                       variant="link"
