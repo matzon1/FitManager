@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { attendanceApi, membersApi } from "../api/endpoints";
 import { useState } from "react";
 import { parseUtc } from "../utils/dates";
-import axios, { isAxiosError } from "axios";
+import { isAxiosError } from "axios";
 import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { Select } from "../components/ui/Field";
 
 export function AttendancePage() {
   const {
@@ -50,59 +52,76 @@ export function AttendancePage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold">Attendance</h1>
-
-      <div className="mb-4">
-        <select
-          value={memberId}
-          onChange={(e) => setMemberId(Number(e.target.value))}
-          className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value={0}>Select a member</option>
-          {members?.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.firstName} {member.lastName}
-            </option>
-          ))}
-        </select>
-        <Button onClick={handleCheckIn} className="ml-2">
-          Check In
-        </Button>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-semibold text-foreground">Attendance</h1>
       </div>
-      {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            {["Member", "Check-in Time", "Check-out Time"].map((h) => (
-              <th key={h} className="py-2 px-4 text-left">
-                {h}
-              </th>
+
+      <Card className="p-5 mb-6 max-w-2xl">
+        <h2 className="font-medium mb-4 text-foreground">Check in a member</h2>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Select
+            value={memberId}
+            onChange={(e) => setMemberId(Number(e.target.value))}
+          >
+            <option value={0}>Select a member</option>
+            {members?.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.firstName} {member.lastName}
+              </option>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {attendanceLogs?.map((log) => (
-            <tr key={log.id} className="border-b border-gray-200">
-              <td className="py-2 px-4">{log.memberName}</td>
-              <td className="py-2 px-4">
-                {log.checkInTime
-                  ? parseUtc(log.checkInTime).toLocaleTimeString()
-                  : "Not checked in"}
-              </td>
-              <td className="py-2 px-4">
-                {log.checkOutTime ? (
-                  parseUtc(log.checkOutTime).toLocaleTimeString()
-                ) : (
-                  <Button variant="link" onClick={() => handleCheckOut(log.id)}>
-                    Check Out
-                  </Button>
-                )}
-              </td>
+          </Select>
+          <Button onClick={handleCheckIn}>Check In</Button>
+        </div>
+        {error && (
+          <p role="alert" className="text-sm text-danger mt-3">
+            {error}
+          </p>
+        )}
+      </Card>
+
+      <Card className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-surface-2 border-b border-border">
+            <tr>
+              {["Member", "Check-in Time", "Check-out Time"].map((h) => (
+                <th
+                  key={h}
+                  className="text-left px-4 py-3 font-medium text-muted"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {attendanceLogs?.map((log) => (
+              <tr key={log.id} className="hover:bg-surface-2">
+                <td className="px-4 py-3 font-medium text-foreground">
+                  {log.memberName}
+                </td>
+                <td className="px-4 py-3 text-muted">
+                  {log.checkInTime
+                    ? parseUtc(log.checkInTime).toLocaleTimeString()
+                    : "Not checked in"}
+                </td>
+                <td className="px-4 py-3 text-muted">
+                  {log.checkOutTime ? (
+                    parseUtc(log.checkOutTime).toLocaleTimeString()
+                  ) : (
+                    <Button
+                      variant="link"
+                      onClick={() => handleCheckOut(log.id)}
+                    >
+                      Check Out
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
     </div>
   );
 }
