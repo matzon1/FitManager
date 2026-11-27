@@ -67,7 +67,7 @@ export function MembersPage() {
       </div>
 
       {showForm && (
-        <Card className="p-5 mb-6 max-w-2xl">
+        <Card className="p-5 mb-6">
           <h2 className="font-medium mb-4 text-foreground">New member</h2>
           <form
             onSubmit={handleCreate}
@@ -93,12 +93,21 @@ export function MembersPage() {
                 setForm({ ...form, dateOfBirth: e.target.value })
               }
             />
-            {/* keep your Cancel / Save div here, with sm:col-span-2 instead of col-span-2 */}
+            <div className="sm:col-span-2 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save</Button>
+            </div>
           </form>
         </Card>
       )}
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-surface-2 border-b border-border">
             <tr>
