@@ -4,6 +4,14 @@ import { Dumbbell } from 'lucide-react';
 import { authApi } from '../api/endpoints';
 import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
+import Badge, {type Tone } from '../components/ui/Badge';
+import  Card from '../components/ui/Card';
+import {Input} from '../components/ui/Field';
+import { membersApi } from '../api/endpoints';
+import { Plus } from 'lucide-react';
+import type { Member } from '../types';
+import { useAuthStore as useAuth } from '../store/authStore';
+import { parseUtc } from '../utils/dates';
 
 
 export function LoginPage() {
@@ -39,13 +47,11 @@ export function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Username</label>
-            <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={username} onChange={e => setUsername(e.target.value)} placeholder="admin" required />
+            <Input value={username} onChange={e => setUsername(e.target.value)} placeholder="username" required />
           </div>
           <div>
             <label className="block text-sm text-gray-600 mb-1">Password</label>
-            <input type="password" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password} onChange={e => setPassword(e.target.value)} placeholder="admin123" required />
+            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="password" required />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button className="w-full" type="submit" disabled={loading}>
@@ -103,11 +109,12 @@ export function DashboardPage() {
   );
 }
 
-import { membersApi } from '../api/endpoints';
-import { Plus } from 'lucide-react';
-import type { Member } from '../types';
-import { useAuthStore as useAuth } from '../store/authStore';
-import { parseUtc } from '../utils/dates';
+  const statusToneColor: Record<string, Tone> = { 
+    Active: 'success',
+  Frozen: 'info',
+  Expired: 'neutral',
+  Cancelled: 'danger',
+  };
 
 export function MembersPage() {
   const { data: members, isLoading, refetch } = useQuery({ queryKey: ['members'], queryFn: membersApi.getAll });
@@ -123,68 +130,62 @@ export function MembersPage() {
     refetch();
   };
 
-  const statusColor = (s: string) => ({
-    Active: 'bg-green-100 text-green-700',
-    Frozen: 'bg-blue-100 text-blue-700',
-    Expired: 'bg-gray-100 text-gray-600',
-    Cancelled: 'bg-red-100 text-red-700',
-  }[s] ?? 'bg-gray-100 text-gray-600');
 
-  if (isLoading) return <div className="text-gray-500">Loading...</div>;
+
+
+  if (isLoading) return <div className="text-muted">Loading...</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Members</h1>
+        <h1 className="text-x1 font-semibold text-foreground">Members</h1>
         {role === 'Admin' && (
-          <Button onClick={() => setShowForm(true)} type="submit">
+          <Button onClick={() => setShowForm(true)}>
             <Plus size={16} /> Add member
           </Button>
         )}
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-          <h2 className="font-medium text-gray-800 mb-4">New member</h2>
+        <Card className="p-5 mb-6">
+          <h2 className="font-medium mb-4 text-foreground">New member</h2>
           <form onSubmit={handleCreate} className="grid grid-cols-2 gap-3">
             {(['firstName', 'lastName', 'email', 'phone'] as const).map(f => (
-              <input key={f} placeholder={f} required
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <Input key={f} placeholder={f} required
                 value={form[f]} onChange={e => setForm({ ...form, [f]: e.target.value })} />
             ))}
-            <input type="date" required
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <Input type="date" required
               value={form.dateOfBirth} onChange={e => setForm({ ...form, dateOfBirth: e.target.value })} />
             <div className="col-span-2 flex gap-2 justify-end">
               <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>Cancel</Button>
               <Button type="submit" >Save</Button>
             </div>
           </form>
-        </div>
+        </Card>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>{['Name', 'Email', 'Phone', 'Joined', 'Status'].map(h => (
-              <th key={h} className="text-left px-4 py-3 font-medium text-gray-600">{h}</th>
-            ))}</tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {members?.map((m: Member) => (
-              <tr key={m.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{m.firstName} {m.lastName}</td>
-                <td className="px-4 py-3 text-gray-600">{m.email}</td>
-                <td className="px-4 py-3 text-gray-600">{m.phone}</td>
-                <td className="px-4 py-3 text-gray-600">{new Date(m.joinDate).toLocaleDateString()}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(m.status)}`}>{m.status}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+   <Card className="overflow-hidden">
+  <table className="w-full text-sm">
+    <thead className="bg-surface-2 border-b border-border">
+      <tr>{['Name', 'Email', 'Phone', 'Joined', 'Status'].map(h => (
+        <th key={h} className="text-left px-4 py-3 font-medium text-muted">{h}</th>
+      ))}</tr>
+    </thead>
+    <tbody className="divide-y divide-border">
+      {members?.map((m: Member) => (
+        <tr key={m.id} className="hover:bg-surface-2">
+          <td className="px-4 py-3 font-medium text-foreground">{m.firstName} {m.lastName}</td>
+          <td className="px-4 py-3 text-muted">{m.email}</td>
+          <td className="px-4 py-3 text-muted">{m.phone}</td>
+          <td className="px-4 py-3 text-muted">{new Date(m.joinDate).toLocaleDateString()}</td>
+          <td className="px-4 py-3">
+            <Badge tone={statusToneColor[m.status] ?? 'neutral'}>{m.status}</Badge>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</Card>
     </div>
   );
 }
