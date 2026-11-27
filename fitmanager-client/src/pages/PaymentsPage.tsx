@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { paymentsApi } from "../api/endpoints";
+import { paymentsApi, membersApi } from "../api/endpoints";
 import type { Payment } from "../types";
 import { Plus } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
-import { membersApi } from "../api/endpoints";
 import { parseUtc } from "../utils/dates";
 import Button from "../components/ui/Button";
+import Badge, { type Tone } from "../components/ui/Badge";
+import Card from "../components/ui/Card";
+import { Input, Select } from "../components/ui/Field";
+
+const statusTone: Record<string, Tone> = {
+  Paid: "success",
+  Pending: "warning",
+  Overdue: "danger",
+  Refunded: "neutral",
+};
 
 export function PaymentsPage() {
   const {
@@ -35,20 +44,91 @@ export function PaymentsPage() {
     refetch();
   };
 
-  if (isLoading) return <div className="text-gray-500">Loading...</div>;
+  if (isLoading) return <div className="text-muted">Loading...</div>;
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-gray-900">Payments</h1>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-semibold text-foreground">Payments</h1>
+        {role === "Admin" && (
+          <Button onClick={() => setShowForm(true)}>
+            <Plus size={16} /> Add payment
+          </Button>
+        )}
+      </div>
+
+      {showForm && (
+        <Card className="p-5 mb-6 ">
+          <h2 className="font-medium mb-4 text-foreground">New payment</h2>
+          <form
+            onSubmit={handleCreate}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+          >
+            <Select
+              value={form.memberId}
+              onChange={(e) =>
+                setForm({ ...form, memberId: Number(e.target.value) })
+              }
+            >
+              <option value={0}>Select member</option>
+              {members?.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.firstName} {m.lastName}
+                </option>
+              ))}
+            </Select>
+
+            <Input
+              type="number"
+              step="0.01"
+              placeholder="Amount"
+              value={form.amount}
+              onChange={(e) =>
+                setForm({ ...form, amount: Number(e.target.value) })
+              }
+            />
+
+            <Select
+              value={form.status}
+              onChange={(e) =>
+                setForm({ ...form, status: Number(e.target.value) })
+              }
+            >
+              <option value={0}>Paid</option>
+              <option value={1}>Pending</option>
+              <option value={2}>Overdue</option>
+              <option value={3}>Refunded</option>
+            </Select>
+
+            <Input
+              placeholder="Notes"
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            />
+
+            <div className="sm:col-span-2 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      <Card className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-surface-2 border-b border-border">
             <tr>
               {["Member", "Amount", "Status", "Notes", "Payment Date"].map(
                 (h) => (
                   <th
                     key={h}
-                    className="text-left px-4 py-3 font-medium text-gray-600"
+                    className="text-left px-4 py-3 font-medium text-muted"
                   >
                     {h}
                   </th>
@@ -56,96 +136,29 @@ export function PaymentsPage() {
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {payments?.map((p: Payment) => (
-              <tr key={p.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">
+              <tr key={p.id} className="hover:bg-surface-2">
+                <td className="px-4 py-3 font-medium text-foreground">
                   {p.memberName}
                 </td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3 text-foreground">
                   {p.amount.toFixed(2)}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{p.status}</td>
-                <td className="px-4 py-3 text-gray-600">{p.notes}</td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3">
+                  <Badge tone={statusTone[p.status] ?? "neutral"}>
+                    {p.status}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3 text-muted">{p.notes}</td>
+                <td className="px-4 py-3 text-muted">
                   {parseUtc(p.paymentDate).toLocaleDateString()}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div className="flex items-center justify-between mb-6">
-        {role === "Admin" && (
-          <Button onClick={() => setShowForm(true)}>
-            <Plus size={16} /> Add payment
-          </Button>
-        )}
-        {showForm && (
-          <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-            <h2 className="font-medium text-gray-800 mb-4">New payment</h2>
-            <form onSubmit={handleCreate} className="grid grid-cols-2 gap-3">
-              <select
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.memberId}
-                onChange={(e) =>
-                  setForm({ ...form, memberId: Number(e.target.value) })
-                }
-              >
-                <option value={0}>Select member</option>
-                {members?.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.firstName} {m.lastName}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.amount}
-                type="number"
-                step="0.01"
-                placeholder="Amount"
-                onChange={(e) =>
-                  setForm({ ...form, amount: Number(e.target.value) })
-                }
-              />
-
-              <select
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.status}
-                onChange={(e) =>
-                  setForm({ ...form, status: Number(e.target.value) })
-                }
-              >
-                <option value={0}>Paid</option>
-                <option value={1}>Pending</option>
-                <option value={2}>Overdue</option>
-                <option value={3}>Refunded</option>
-              </select>
-
-              <input
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.notes}
-                placeholder="Notes"
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              />
-
-              <div className="col-span-2 flex gap-2 justify-end">
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Save</Button>
-              </div>
-            </form>
-          </div>
-        )}
-      </div>
+      </Card>
     </div>
   );
 }
