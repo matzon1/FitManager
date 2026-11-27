@@ -16,6 +16,13 @@ const statusToneColor: Record<string, Tone> = {
   Cancelled: "danger",
 };
 
+const memberFields = [
+  { key: "firstName", label: "First name", type: "text" },
+  { key: "lastName", label: "Last name", type: "text" },
+  { key: "email", label: "Email", type: "email" },
+  { key: "phone", label: "Phone", type: "tel" },
+] as const;
+
 export function MembersPage() {
   const {
     data: members,
@@ -51,7 +58,7 @@ export function MembersPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-x1 font-semibold text-foreground">Members</h1>
+        <h1 className="text-xl font-semibold text-foreground">Members</h1>
         {role === "Admin" && (
           <Button onClick={() => setShowForm(true)}>
             <Plus size={16} /> Add member
@@ -60,36 +67,33 @@ export function MembersPage() {
       </div>
 
       {showForm && (
-        <Card className="p-5 mb-6">
+        <Card className="p-5 mb-6 max-w-2xl">
           <h2 className="font-medium mb-4 text-foreground">New member</h2>
-          <form onSubmit={handleCreate} className="grid grid-cols-2 gap-3">
-            {(["firstName", "lastName", "email", "phone"] as const).map((f) => (
+          <form
+            onSubmit={handleCreate}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+          >
+            {memberFields.map(({ key, label, type }) => (
               <Input
-                key={f}
-                placeholder={f}
+                key={key}
+                type={type}
+                placeholder={label}
+                aria-label={label}
                 required
-                value={form[f]}
-                onChange={(e) => setForm({ ...form, [f]: e.target.value })}
+                value={form[key]}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
               />
             ))}
             <Input
               type="date"
+              aria-label="Date of birth"
               required
               value={form.dateOfBirth}
               onChange={(e) =>
                 setForm({ ...form, dateOfBirth: e.target.value })
               }
             />
-            <div className="col-span-2 flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Save</Button>
-            </div>
+            {/* keep your Cancel / Save div here, with sm:col-span-2 instead of col-span-2 */}
           </form>
         </Card>
       )}

@@ -103,7 +103,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </span>
         </div>
       </header>
-      <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
+      <main className="flex-1 overflow-auto p-4 lg:p-6">
+        <div className="mx-auto w-full max-w-6xl">{children}</div>
+      </main>
       {open && (
         <div className="lg:hidden">
           {/* dark area behind the drawer */}
